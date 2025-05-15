@@ -19,6 +19,7 @@ st.markdown("""
 This dashboard displays the map of Newham Borough, specifically highlighting East and West Ham areas.
 Future updates will include additional data visualization and statistics for these areas.
 """)
+# ... (previous code in app.py like st.markdown(...)) ...
 
 try:
     # Create a map centered on Newham
@@ -32,8 +33,13 @@ try:
     @st.cache_data
     def load_ward_boundaries():
         try:
-            # Read the local GeoJSON file
-            gdf = gpd.read_file("newham_wards.geojson")
+            # Read the GeoJSON file directly
+            with open('newham_wards.geojson', 'r') as f:
+                geojson_data = json.load(f)
+            
+            # Convert to GeoDataFrame
+            gdf = gpd.GeoDataFrame.from_features(geojson_data['features'])
+            gdf.set_crs("EPSG:4326", inplace=True)  # Set the CRS
             return gdf
         except Exception as e:
             st.error(f"Error loading ward boundaries: {str(e)}")
@@ -44,6 +50,7 @@ try:
     
     if wards_gdf is not None:
         # Filter for East Ham and West Ham wards
+
         east_ham_ward = wards_gdf[wards_gdf['NAME'].str.contains('East Ham', case=False, na=False)]
         west_ham_ward = wards_gdf[wards_gdf['NAME'].str.contains('West Ham', case=False, na=False)]
 
