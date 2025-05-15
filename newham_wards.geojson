@@ -1,0 +1,49 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "NAME": "East Ham Central",
+        "WARD_CODE": "E05000477"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[0.0517, 51.5389], [0.0617, 51.5389], [0.0617, 51.5489], [0.0517, 51.5489], [0.0517, 51.5389]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "NAME": "East Ham North",
+        "WARD_CODE": "E05000478"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[0.0517, 51.5489], [0.0617, 51.5489], [0.0617, 51.5589], [0.0517, 51.5589], [0.0517, 51.5489]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "NAME": "East Ham South",
+        "WARD_CODE": "E05000479"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[0.0517, 51.5289], [0.0617, 51.5289], [0.0617, 51.5389], [0.0517, 51.5389], [0.0517, 51.5289]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "NAME": "West Ham",
+        "WARD_CODE": "E05000480"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[0.0217, 51.5389], [0.0317, 51.5389], [0.0317, 51.5489], [0.0217, 51.5489], [0.0217, 51.5389]]]
+      }
+    }
+  ]
+} 

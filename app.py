@@ -3,6 +3,8 @@ import folium
 from streamlit_folium import folium_static
 import geopandas as gpd
 import pandas as pd
+import requests
+import json
 
 # Set page configuration
 st.set_page_config(
@@ -26,47 +28,64 @@ try:
         tiles='CartoDB positron'
     )
 
-    # Add East Ham and West Ham boundaries with more precise coordinates
-    east_ham_coords = [
-        [51.5389, 0.0517],
-        [51.5389, 0.0617],
-        [51.5489, 0.0617],
-        [51.5489, 0.0517],
-        [51.5389, 0.0517]
-    ]
+    # Load ward boundaries for Newham
+    # Using London Data Store ward boundaries
+    url = "https://data.london.gov.uk/download/statistical-gis-boundary-files-london/9ba8c833-6370-4b11-abdc-314aa020d5e0/London-wards-2018_ESRI.zip"
+    
+    # Download and read the GeoJSON data
+    @st.cache_data
+    def load_ward_boundaries():
+        try:
+            # Read the GeoJSON file
+            gdf = gpd.read_file("https://raw.githubusercontent.com/mingda/LLDC_EPC/main/newham_wards.geojson")
+            return gdf
+        except Exception as e:
+            st.error(f"Error loading ward boundaries: {str(e)}")
+            return None
 
-    west_ham_coords = [
-        [51.5389, 0.0217],
-        [51.5389, 0.0317],
-        [51.5489, 0.0317],
-        [51.5489, 0.0217],
-        [51.5389, 0.0217]
-    ]
+    # Load the ward boundaries
+    wards_gdf = load_ward_boundaries()
+    
+    if wards_gdf is not None:
+        # Filter for East Ham and West Ham wards
+        east_ham_ward = wards_gdf[wards_gdf['NAME'].str.contains('East Ham', case=False, na=False)]
+        west_ham_ward = wards_gdf[wards_gdf['NAME'].str.contains('West Ham', case=False, na=False)]
 
-    # Add polygons for East and West Ham with improved styling
-    folium.Polygon(
-        locations=east_ham_coords,
-        color='blue',
-        fill=True,
-        fill_color='blue',
-        fill_opacity=0.3,
-        weight=2,
-        popup='East Ham',
-        tooltip='East Ham'
-    ).add_to(m)
+        # Add East Ham ward to map
+        if not east_ham_ward.empty:
+            folium.GeoJson(
+                east_ham_ward,
+                style_function=lambda x: {
+                    'fillColor': 'blue',
+                    'color': 'blue',
+                    'fillOpacity': 0.3,
+                    'weight': 2
+                },
+                tooltip=folium.GeoJsonTooltip(
+                    fields=['NAME'],
+                    aliases=['Ward:'],
+                    style=("background-color: white; color: #333333; font-family: arial; font-size: 12px; padding: 10px;")
+                )
+            ).add_to(m)
 
-    folium.Polygon(
-        locations=west_ham_coords,
-        color='red',
-        fill=True,
-        fill_color='red',
-        fill_opacity=0.3,
-        weight=2,
-        popup='West Ham',
-        tooltip='West Ham'
-    ).add_to(m)
+        # Add West Ham ward to map
+        if not west_ham_ward.empty:
+            folium.GeoJson(
+                west_ham_ward,
+                style_function=lambda x: {
+                    'fillColor': 'red',
+                    'color': 'red',
+                    'fillOpacity': 0.3,
+                    'weight': 2
+                },
+                tooltip=folium.GeoJsonTooltip(
+                    fields=['NAME'],
+                    aliases=['Ward:'],
+                    style=("background-color: white; color: #333333; font-family: arial; font-size: 12px; padding: 10px;")
+                )
+            ).add_to(m)
 
-    # Add markers for key locations with improved styling
+    # Add markers for key locations
     folium.Marker(
         [51.5417, 0.0517],
         popup='East Ham Station',
@@ -81,11 +100,12 @@ try:
         icon=folium.Icon(color='red', icon='info-sign', prefix='fa')
     ).add_to(m)
 
-    # Add a scale bar
+    # Add map controls
     folium.plugins.Fullscreen().add_to(m)
     folium.plugins.MousePosition().add_to(m)
+    folium.plugins.MiniMap().add_to(m)
 
-    # Display the map with a specific height
+    # Display the map
     folium_static(m, width=1200, height=600)
 
     # Add some placeholder statistics
@@ -103,10 +123,10 @@ try:
     # Add a note about future updates
     st.info("""
     This is a basic version of the dashboard. Future updates will include:
-    - More detailed boundary data
     - Additional statistics and metrics
     - Interactive data visualization
     - Historical data comparison
+    - More detailed ward information
     """)
 
 except Exception as e:
