@@ -29,15 +29,11 @@ try:
     )
 
     # Load ward boundaries for Newham
-    # Using London Data Store ward boundaries
-    url = "https://data.london.gov.uk/download/statistical-gis-boundary-files-london/9ba8c833-6370-4b11-abdc-314aa020d5e0/London-wards-2018_ESRI.zip"
-    
-    # Download and read the GeoJSON data
     @st.cache_data
     def load_ward_boundaries():
         try:
-            # Read the GeoJSON file
-            gdf = gpd.read_file("https://raw.githubusercontent.com/mingda/LLDC_EPC/main/newham_wards.geojson")
+            # Read the local GeoJSON file
+            gdf = gpd.read_file("newham_wards.geojson")
             return gdf
         except Exception as e:
             st.error(f"Error loading ward boundaries: {str(e)}")
